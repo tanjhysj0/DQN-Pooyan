@@ -1,23 +1,8 @@
-"""
-This part of code is the DQN brain, which is a brain of the agent.
-All decisions are made in here.
-Using Tensorflow to build the neural network.
-
-View more on my tutorial page: https://morvanzhou.github.io/tutorials/
-
-Using:
-Tensorflow: 1.0
-gym: 0.7.3
-"""
-
 import numpy as np
 import pandas as pd
 import tensorflow as tf
 
-np.random.seed(1)
-tf.set_random_seed(1)
 import time
-
 
 # Deep Q Network off-policy
 class DeepQNetwork:
@@ -143,22 +128,21 @@ class DeepQNetwork:
             padding='valid',
             activation=tf.nn.relu
         )  # -> (81, 52, 24)
-        print(conv1)
+
         pool1 = tf.layers.max_pooling2d(
             conv1,
             pool_size=(3,2),
             strides=(3,2),
         )  # -> (27, 26, 24)
-        print(pool1)
+
 
         conv2 = tf.layers.conv2d(pool1, 48, (3,2), 1, 'valid', activation=tf.nn.relu)  # -> (25, 25, 48)
-        print(conv2)
+
 
         pool2 = tf.layers.max_pooling2d(conv2, 5, 5)  # -> (9, 13, 48)
-        print(pool2)
 
         flat = tf.reshape(pool2, [-1,5*5* 48])  # -> (7*7*32, )
-        print(flat)
+
         self.output = tf.layers.dense(flat,self.n_features)  # output layer
         return self.output
 
@@ -180,7 +164,7 @@ class DeepQNetwork:
         if np.random.uniform() < self.epsilon:
             # forward feed the observation and get q value for every actions
             actions_value = self.sess.run(self.q_eval, feed_dict={self.s: observation})  # (1,10)
-            print(actions_value)
+
             action = np.argmax(actions_value)
         else:
             action = np.random.randint(0, self.n_actions)
@@ -202,11 +186,6 @@ class DeepQNetwork:
 
         # 一条记忆中，前两列是动作前状态，后两列是动作后状态,
         # 取得新神经网络的Q值(动作前状态s)和旧神经网络的Q值(动作后状态s_估算)
-        # print(batch_memory.shape)#(32, 240002)
-        #
-        # print(batch_memory[:, -self.width*self.height*self.deep:].shape)   #(32, 120000)
-        # print(batch_memory[:, -self.width*self.height*self.deep:].reshape(self.batch_size,self.width, self.height, self.deep))
-        #
 
         s_f = batch_memory[:, -self.width*self.height*self.deep:].reshape(self.batch_size,self.width,self.height,self.deep)
         sf = batch_memory[:, :self.width*self.height*self.deep].reshape(self.batch_size,self.width,self.height,self.deep)

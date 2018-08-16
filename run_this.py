@@ -15,7 +15,7 @@ def run_maze():
             # RL choose action based on observation
             action = RL.choose_action(observation)
             # RL take action and get next observation and reward
-            print(RL.epsilon)
+
             observation_, reward, done,_ = env.step(action)
             rSum+=reward
             RL.store_transition(observation, action, reward, observation_)
